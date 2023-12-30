@@ -1,15 +1,48 @@
-<!doctype html>
+<?php
+ob_start("minifier");
+
+if ($_SERVER['SERVER_NAME'] !== 'localhost') {
+	if ((!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' ||
+	$_SERVER['HTTPS'] == 1) ||
+	isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
+	$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ||
+	("www" === array_shift((explode('.', $_SERVER['HTTP_HOST'])))))
+	{
+	$redirect = 'https://marchesson.com' . $_SERVER['REQUEST_URI'];
+	header('HTTP/1.1 301 Moved Permanently');
+	header('Location: ' . $redirect);
+	exit();
+	}
+}
+
+function minifier($code) {
+    $search = array(
+        // Remove whitespaces after tags
+        '/\>[^\S ]+/s',
+        // Remove whitespaces before tags
+        '/[^\S ]+\</s',
+        // Remove multiple whitespace sequences
+        '/(\s)+/s',
+        // Removes comments
+        '/<!--(.|\s)*?-->/'
+    );
+    $replace = array('>', '<', '\\1');
+    $code = preg_replace($search, $replace, $code);
+    return $code;
+}
+
+?><!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>
   <link rel="shortcut icon" href="favicon.ico" type="image/webp">
   <link rel="icon" href="favicon.ico" type="image/webp">
-  <meta name="description" content="All profiles links of David Marchesson available here." />
+  <meta name="description" content="20 ans d'expérience dans le développement web, en tant que salarié et indépendant. Gestion de projets, architecture, direction technique, référencement, formation." />
   <meta property="og:title" content="David Marchesson All Links" />
   <link rel="canonical" href="https://www.marchesson.com" />
   <meta property="og:url" content="https://www.marchesson.com" />
-  <meta property="og:description" content="All profiles links of David Marchesson available here" />
+  <meta property="og:description" content="20 ans d'expérience dans le développement web, en tant que salarié et indépendant. Gestion de projets, architecture, direction technique, référencement, formation." />
   <meta property="og:image:secure_url" content="https://www.marchesson.com/David-Marchesson-freelance-original.png" />
   <meta property="og:image" content="https://www.marchesson.com/David-Marchesson-freelance-original.png" />
   <meta property="profile:username" content="samirpaul" />
@@ -424,7 +457,6 @@
       font-weight: 500;
       text-transform: none;
       border-radius: 8px;
-
       min-height: 60px;
     }
 
@@ -535,8 +567,8 @@
             <path fill-rule="evenodd" clip-rule="evenodd" d="M15 0.25C6.8538 0.25 0.25 6.8538 0.25 15C0.25 23.1462 6.8538 29.75 15 29.75C23.1462 29.75 29.75 23.1462 29.75 15C29.75 6.8538 23.1462 0.25 15 0.25ZM1.75 15C1.75 7.68223 7.68223 1.75 15 1.75C22.3178 1.75 28.25 7.68223 28.25 15C28.25 22.3178 22.3178 28.25 15 28.25C12.8029 28.25 10.7307 27.7152 8.90648 26.7688L13.0553 18.5542C14.9571 20.27 17.8623 20.5629 20.0887 19.102C23.2759 17.0106 24.1112 12.7636 21.9534 9.621C19.3235 5.79083 14.0487 4.7534 10.1642 7.30234C5.38364 10.4393 4.13047 16.811 7.367 21.5247L8.60358 20.6756C5.84293 16.655 6.90949 11.2321 10.9872 8.55645C14.1893 6.45527 18.5489 7.31272 20.7168 10.47C22.3987 12.9196 21.75 16.2177 19.2657 17.8479C17.5017 19.0055 15.1513 18.6702 13.7659 17.1471L15.6695 13.3781L14.3305 12.7019L7.61344 26.0017C4.07676 23.6225 1.75 19.583 1.75 15Z" fill="white" />
           </svg>
         </div>
-
       </div>
+
       <div class="mt-24">
         <div class="page-item-wrap relative">
           <h3 class="page-title color-dark mt-32" style="text-align:center;">PROJETS ACTUELS</h3>
@@ -625,7 +657,7 @@
         </div>
       </div>
       <div class="mt-24">
-      <div id="wcb" class="carbonbadge"><style>#wcb.carbonbadge{--b1:#0e11a8;--b2:#00ffbc;font-size:15px;text-align:center;color:var(--b1);line-height:1.15}#wcb.carbonbadge sub{vertical-align:middle;position:relative;top:.3em;font-size:.7em}#wcb #wcb_2,#wcb #wcb_a,#wcb #wcb_g{display:inline-flex;justify-content:center;align-items:center;text-align:center;font-size:1em;line-height:1.15;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-decoration:none;margin:.2em 0}#wcb #wcb_a,#wcb #wcb_g{padding:.3em .5em;border:.13em solid var(--b2)}#wcb #wcb_g{border-radius:.3em 0 0 .3em;background:#fff;border-right:0;min-width:8.2em}#wcb #wcb_a{border-radius:0 .3em .3em 0;border-left:0;background:var(--b1);color:#fff;font-weight:700;border-color:var(--b1)}#wcb.wcb-d #wcb_a{color:var(--b1);background:var(--b2);border-color:var(--b2)}#wcb.wcb-d #wcb_2{color:#fff}</style><div id="wcb_p"><span id="wcb_g">0.06g of CO<sub>2</sub>/view</span><a id="wcb_a" target="_blank" rel="noopener" href="https://www.websitecarbon.com/website/marchesson-com/">Website Carbon</a></div><span id="wcb_2">&nbsp;Cleaner than 95% of pages tested</span></div>
+      <div id="wcb" class="carbonbadge"><style>#wcb.carbonbadge{--b1:#0e11a8;--b2:#00ffbc;font-size:15px;text-align:center;color:var(--b1);line-height:1.15}#wcb.carbonbadge sub{vertical-align:middle;position:relative;top:.3em;font-size:.7em}#wcb #wcb_2,#wcb #wcb_a,#wcb #wcb_g{display:inline-flex;justify-content:center;align-items:center;text-align:center;font-size:1em;line-height:1.15;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-decoration:none;margin:.2em 0}#wcb #wcb_a,#wcb #wcb_g{padding:.3em .5em;border:.13em solid var(--b2)}#wcb #wcb_g{border-radius:.3em 0 0 .3em;background:#fff;border-right:0;min-width:8.2em}#wcb #wcb_a{border-radius:0 .3em .3em 0;border-left:0;background:var(--b1);color:#fff;font-weight:700;border-color:var(--b1)}#wcb.wcb-d #wcb_a{color:var(--b1);background:var(--b2);border-color:var(--b2)}#wcb.wcb-d #wcb_2{color:#fff}</style><div id="wcb_p"><span id="wcb_g">0.03g of CO<sub>2</sub>/view</span><a id="wcb_a" target="_blank" rel="noopener" href="https://www.websitecarbon.com/website/marchesson-com/">Website Carbon</a></div><span id="wcb_2">&nbsp;Cleaner than 97% of pages tested</span></div>
       </div>
       </div>
     <script>
@@ -648,3 +680,6 @@
     </script>
 </body>
 </html>
+<?php
+ob_end_flush();
+?>
