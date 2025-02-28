@@ -1,5 +1,5 @@
 <?php
-ob_start("minifier");
+//ob_start("ob_gzhandler");
 
 if ($_SERVER['SERVER_NAME'] !== 'localhost') {
 	if ((!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' ||
@@ -14,23 +14,6 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
 	exit();
 	}
 }
-
-function minifier($code) {
-    $search = array(
-        // Remove whitespaces after tags
-        '/\>[^\S ]+/s',
-        // Remove whitespaces before tags
-        '/[^\S ]+\</s',
-        // Remove multiple whitespace sequences
-        '/(\s)+/s',
-        // Removes comments
-        '/<!--(.|\s)*?-->/'
-    );
-    $replace = array('>', '<', '\\1');
-    $code = preg_replace($search, $replace, $code);
-    return $code;
-}
-
 ?><!doctype html>
 <html lang="fr">
 <head>
@@ -50,9 +33,10 @@ function minifier($code) {
   <meta name="twitter:title" content="David Marchesson" />
   <meta name="twitter:image" content="https://www.marchesson.com/David-Marchesson-freelance-original.png" />
   <meta name="twitter:url" content="https://www.marchesson.com" />
-  <title>David Marchesson - Formateur numérique et développeur</title>
+  <title>David Marchesson - Développeur Full Stack & Formateur numérique</title>
   <link rel="apple-touch-icon" sizes="180x180" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="me" href="https://mamot.fr/@dmarchesson">
   <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i|Montserrat:400,700&display=swap" rel="stylesheet">
   <meta name="robots" content="index, follow" />
   <style>
@@ -532,8 +516,12 @@ function minifier($code) {
       <h2 class="page-text-color page-title-font mt-16 text-center">
         David Marchesson
       </h2>
-      <div class="page-bioline text-fs-16 page-text-color page-title-font mt-12 ln-h-22 text-center">Formateur numérique & développeur créatif senior</div>
+      <div class="page-bioline text-fs-16 page-text-color page-title-font mt-12 ln-h-22 text-center">Développeur Full Stack & Formateur numérique</div>
       <div class="flex-both-center flex-wrap mt-24">
+        <div class="page-social relative">
+          <a class="social-icon-anchor" aria-label="pinterest" data-id="pinterest" data-type="social_link" target="_blank" href="https://www.youtube.com/@karillon"></a>
+          <svg class="social-icon-fill" height="30" width="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M39.256,6.5H9.744C4.371,6.5,0,10.885,0,16.274v16.451c0,5.39,4.371,9.774,9.744,9.774h29.512 c5.373,0,9.744-4.385,9.744-9.774V16.274C49,10.885,44.629,6.5,39.256,6.5z M47,32.726c0,4.287-3.474,7.774-7.744,7.774H9.744 C5.474,40.5,2,37.012,2,32.726V16.274C2,11.988,5.474,8.5,9.744,8.5h29.512c4.27,0,7.744,3.488,7.744,7.774V32.726z"></path> <path d="M33.36,24.138l-13.855-8.115c-0.308-0.18-0.691-0.183-1.002-0.005S18,16.527,18,16.886v16.229 c0,0.358,0.192,0.69,0.502,0.868c0.154,0.088,0.326,0.132,0.498,0.132c0.175,0,0.349-0.046,0.505-0.137l13.855-8.113 c0.306-0.179,0.495-0.508,0.495-0.863S33.667,24.317,33.36,24.138z M20,31.37V18.63l10.876,6.371L20,31.37z"></path> </g> </g> </g></svg>
+        </div>
         <div class="page-social relative">
           <a class="social-icon-anchor" aria-label="linkedin" data-id="linkedin" data-type="social_link" target="_blank" href="http://www.linkedin.com/in/marchesson"></a>
           <svg class="social-icon-fill" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -573,8 +561,6 @@ function minifier($code) {
             <path fill-rule="evenodd" clip-rule="evenodd" d="M15 0.25C6.8538 0.25 0.25 6.8538 0.25 15C0.25 23.1462 6.8538 29.75 15 29.75C23.1462 29.75 29.75 23.1462 29.75 15C29.75 6.8538 23.1462 0.25 15 0.25ZM1.75 15C1.75 7.68223 7.68223 1.75 15 1.75C22.3178 1.75 28.25 7.68223 28.25 15C28.25 22.3178 22.3178 28.25 15 28.25C12.8029 28.25 10.7307 27.7152 8.90648 26.7688L13.0553 18.5542C14.9571 20.27 17.8623 20.5629 20.0887 19.102C23.2759 17.0106 24.1112 12.7636 21.9534 9.621C19.3235 5.79083 14.0487 4.7534 10.1642 7.30234C5.38364 10.4393 4.13047 16.811 7.367 21.5247L8.60358 20.6756C5.84293 16.655 6.90949 11.2321 10.9872 8.55645C14.1893 6.45527 18.5489 7.31272 20.7168 10.47C22.3987 12.9196 21.75 16.2177 19.2657 17.8479C17.5017 19.0055 15.1513 18.6702 13.7659 17.1471L15.6695 13.3781L14.3305 12.7019L7.61344 26.0017C4.07676 23.6225 1.75 19.583 1.75 15Z" fill="white" />
           </svg>
         </div>
-      </div>
-
       <div class="mt-24">
         <div class="page-item-wrap relative">
           <h3 class="page-title color-dark mt-32" style="text-align:center;">PROJETS ACTUELS</h3>
@@ -663,8 +649,7 @@ function minifier($code) {
         </div>
       </div>
       <div class="mt-24">
-        <div id="wcb" class="carbonbadge"></div>
-        <script src="https://unpkg.com/website-carbon-badges@1.1.3/b.min.js" defer></script>
+        <div id="wcb" class="carbonbadge"><style>#wcb.carbonbadge{--b1:#0e11a8;--b2:#00ffbc;font-size:15px;text-align:center;color:var(--b1);line-height:1.15}#wcb.carbonbadge sub{vertical-align:middle;position:relative;top:.3em;font-size:.7em}#wcb #wcb_2,#wcb #wcb_a,#wcb #wcb_g{display:inline-flex;justify-content:center;align-items:center;text-align:center;font-size:1em;line-height:1.15;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-decoration:none;margin:.2em 0}#wcb #wcb_a,#wcb #wcb_g{padding:.3em .5em;border:.13em solid var(--b2)}#wcb #wcb_g{border-radius:.3em 0 0 .3em;background:#fff;border-right:0;min-width:8.2em}#wcb #wcb_a{border-radius:0 .3em .3em 0;border-left:0;background:var(--b1);color:#fff;font-weight:700;border-color:var(--b1)}#wcb.wcb-d #wcb_a{color:var(--b1);background:var(--b2);border-color:var(--b2)}#wcb.wcb-d #wcb_2{color:#fff}</style><div id="wcb_p"><span id="wcb_g">0.03g of CO<sub>2</sub>/view</span><a id="wcb_a" target="_blank" rel="noopener" href="https://www.websitecarbon.com/website/marchesson-com/">Website Carbon</a></div><span id="wcb_2">&nbsp;Cleaner than 97% of pages tested</span></div>
       </div>
       </div>
     <script>
@@ -689,5 +674,5 @@ function minifier($code) {
 </body>
 </html>
 <?php
-ob_end_flush();
+ob_end_clean();
 ?>
