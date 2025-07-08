@@ -1,19 +1,30 @@
 <?php
-//ob_start("ob_gzhandler");
+// Configuration
+define('DOMAIN', 'marchesson.com');
+define('PROTOCOL', 'https');
 
+// HTTPS redirect and www removal
 if ($_SERVER['SERVER_NAME'] !== 'localhost') {
-	if ((!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' ||
-	$_SERVER['HTTPS'] == 1) ||
-	isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
-	$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ||
-	("www" === array_shift((explode('.', $_SERVER['HTTP_HOST'])))))
-	{
-	$redirect = 'https://marchesson.com' . $_SERVER['REQUEST_URI'];
-	header('HTTP/1.1 301 Moved Permanently');
-	header('Location: ' . $redirect);
-	exit();
+	try {
+		$isHttps = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||
+				   isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https';
+		$hasWww = strpos($_SERVER['HTTP_HOST'], 'www.') === 0;
+
+		if (!$isHttps || $hasWww) {
+			$redirect = PROTOCOL . '://' . DOMAIN . $_SERVER['REQUEST_URI'];
+			header('HTTP/1.1 301 Moved Permanently');
+			header('Location: ' . $redirect);
+			exit();
+		}
+	} catch (Exception $e) {
+		// Log error in production, continue loading page
+		error_log('Redirect error: ' . $e->getMessage());
 	}
 }
+
+// Cache headers for performance
+header('Cache-Control: public, max-age=3600');
+header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
 ?><!doctype html>
 <html lang="fr">
 <head>
@@ -39,472 +50,7 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
   <link rel="me" href="https://mamot.fr/@dmarchesson">
   <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i|Montserrat:400,700&display=swap" rel="stylesheet">
   <meta name="robots" content="index, follow" />
-  <style>
-    body,
-    html {
-      -ms-scroll-chaining: none;
-      overscroll-behavior: none;
-      margin: 0;
-      padding: 0
-    }
-    .min-h-full {
-      min-height: 100vh
-    }
-
-    .flex {
-      display: flex
-    }
-
-    .flex-both-center {
-      display: flex;
-      justify-content: center;
-      align-items: center
-    }
-
-    .flex-wrap {
-      flex-wrap: wrap
-    }
-
-    .flex-h-center {
-      display: flex;
-      justify-content: center
-    }
-
-    .item-center {
-      align-items: center
-    }
-
-    .flex-dir-c {
-      flex-direction: column
-    }
-
-    .mx-auto {
-      margin-left: auto;
-      margin-right: auto
-    }
-
-    .mt-2 {
-      margin-top: 2px
-    }
-
-    .mt-4 {
-      margin-top: 4px
-    }
-
-    .mt-8 {
-      margin-top: 8px
-    }
-
-    .mt-12 {
-      margin-top: 12px
-    }
-
-    .mt-16 {
-      margin-top: 16px
-    }
-
-    .mt-24 {
-      margin-top: 24px
-    }
-
-    .mt-32 {
-      margin-top: 32px
-    }
-
-    .mt-48 {
-      margin-top: 48px
-    }
-
-    .mt-120 {
-      margin-top: 120px
-    }
-
-    .mb-48 {
-      margin-bottom: 48px
-    }
-
-    .m-auto {
-      margin: auto
-    }
-
-    .ml-6 {
-      margin-left: 6px
-    }
-
-    .py-10 {
-      padding: 10px
-    }
-
-    .ln-h-22 {
-      line-height: 22px
-    }
-
-    .ln-h-32 {
-      line-height: 32px
-    }
-
-    .text-fs-14 {
-      font-size: 14px
-    }
-
-    .text-fs-16 {
-      font-size: 16px
-    }
-
-    .text-fs-18 {
-      font-size: 18px
-    }
-
-    .text-fs-20 {
-      font-size: 20px
-    }
-
-    .text-fs-22 {
-      font-size: 22px
-    }
-
-    .color-gray {
-      color: hsla(0, 0%, 100%, .9)
-    }
-
-    .color-dark {
-      color: #222
-    }
-
-    .color-danger {
-      color: #ff4963
-    }
-
-    .page-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      height: 100vh;
-      width: 100vw
-    }
-
-    .w-full {
-      width: 100%
-    }
-
-    .w-250 {
-      width: 250px
-    }
-
-    .h-150,
-    .h-165 {
-      height: 150px
-    }
-
-    .background-overlay {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: 0
-    }
-
-    .page-image {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      -o-object-fit: cover;
-      object-fit: cover
-    }
-
-    .display-image {
-      width: 156px;
-      height: 156px;
-      display: block;
-      border-radius: 50%;
-      -o-object-fit: cover;
-      object-fit: cover
-    }
-
-    .text-center {
-      text-align: center
-    }
-
-    .page-title {
-      margin-bottom: 0
-    }
-
-    .page-bioline {
-      font-weight: 500;
-      font-size: 24px;
-      font-style: italic;
-      line-height: 28px;
-      margin: 0 0 20px;
-      letter-spacing: -0.2px;
-      text-rendering: geometricPrecision;
-    }
-
-    .page-full-wrap {
-      width: 680px;
-      z-index: 10;
-      padding-bottom: 150px;
-    }
-
-    .page-item-wrap {
-      transition: transform .15s cubic-bezier(.17, .67, .29, 2.71) 0s
-    }
-
-    .page-item {
-      box-sizing: border-box;
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1
-    }
-
-    .page-social {
-      display: block;
-      cursor: pointer;
-      margin: 0 12px 12px
-    }
-
-    .page-social svg {
-      width: 28px;
-      height: 28px
-    }
-
-    .relative {
-      position: relative
-    }
-
-    .link-each-image {
-      width: 43px;
-      height: 43px;
-      position: absolute;
-      left: 9px;
-      -o-object-fit: cover;
-      object-fit: cover
-    }
-
-    .page-logo {
-      position: absolute;
-      bottom: 32px;
-      left: calc(50% - 15px)
-    }
-
-    .page-logo:hover svg .bl-logo-br {
-      opacity: 1
-    }
-
-    .rounded-md {
-      border-radius: 8px
-    }
-
-    .page-item-each {
-      text-decoration: none;
-      overflow: hidden;
-      z-index: 10;
-      box-sizing: border-box
-    }
-
-    .item-title {
-      margin: 0 50px;
-      word-break: break-word
-    }
-
-    .item-title strong {
-    font-size: 75%;
-    }
-
-    .social-icon-anchor {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0
-    }
-
-    .page-social:hover {
-      transition: all .1s ease-in-out;
-      transform: scale(1.1)
-    }
-
-    .page-item-title {
-      font-weight: 700;
-      margin-bottom: 16px
-    }
-
-    @media (min-width:768px) {
-      .item-title strong::before {
-        content: " : ";
-        text-transform: lowercase;
-      }
-      .item-title strong {
-        text-transform: lowercase;
-      }
-    }
-
-    @media (max-width:768px) {
-      .display-image {
-        width: 96px;
-        height: 96px;
-      }
-      .item-title strong {
-        display: block;
-        padding-top: 3px;
-      }
-
-      .page-full-wrap {
-        width: 90%
-      }
-
-      .page-overlay-title {
-        font-size: 24px;
-        margin: 16px 0
-      }
-    }
-
-    @media (max-width:480px) {
-      .xs-hidden {
-        display: none
-      }
-
-      .xs-w-100 {
-        width: 100%
-      }
-
-      .xs-w-150 {
-        width: 150px
-      }
-
-      .h-165 {
-        height: 165px
-      }
-
-      .xs-mt-6 {
-        margin-top: 6px
-      }
-
-      .xs-mt-8 {
-        margin-top: 8px
-      }
-
-      .xs-mt-16 {
-        margin-top: 16px
-      }
-
-      .xs-mt-32 {
-        margin-top: 32px
-      }
-
-      .xs-mx-24 {
-        margin: auto 24px
-      }
-
-      .xs-block {
-        display: block
-      }
-    }
-
-    .page-image {
-      object-position: center;
-
-    }
-
-    .display-image {
-      border-radius: 50%;
-    }
-
-    .page-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .page-item-title {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .page-title {
-      font-size: 18px;
-      font-weight: 700;
-      font-family: Montserrat, sans-serif;
-      color: #1F365C;
-    }
-
-    .page-item-each {
-      color: #1F365C;
-      font-family: Montserrat, sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      text-transform: none;
-      border-radius: 8px;
-      min-height: 60px;
-    }
-
-    .page-item-wrap {
-      margin: 16px 0;
-    }
-
-    .page-item-wrap:last-child {
-      margin-bottom: 0;
-    }
-
-    .page-item-wrap:hover {
-      transform: translate3d(0px, 0px, 0px) scale(1.015);
-    }
-
-    .page-item {
-      border: 0px solid #FFFFFF;
-      background: #FFFFFF;
-      border-radius: 8px;
-      box-shadow: 0px 6px 14px -6px rgba(24, 39, 75, 0.12), 0px 10px 32px -4px rgba(24, 39, 75, 0.1), inset 0px 0px 2px 1px rgba(24, 39, 75, 0.05);
-    }
-
-    .link-each-image,
-    .page-item-wrap {
-      border-radius: 8px;
-    }
-
-    .page-text-font {
-      font-family: Montserrat, sans-serif;
-      text-transform: none;
-    }
-
-    .page-title-font {
-      font-family: 'EB Garamond', sans-serif;
-      text-transform: none;
-    }
-    h2.page-title-font {
-      font-size: 36px;
-      font-weight: normal;
-      margin-bottom: 10px;
-      letter-spacing: -0.2px;
-      text-rendering: geometricPrecision;
-    }
-    .page-text-color {
-      color: #1F365C;
-    }
-
-    .social-icon-fill path,
-    .social-icon-fill circle,
-    .social-icon-fill rect {
-      fill: #1F365C;
-    }
-    img.loading {
-      background-color: #babbbc;
-      animation: hintloading 2s ease-in-out 0s infinite reverse;
-    }
-    @keyframes hintloading {
-      0% {
-        opacity: 0.5;
-      }
-      50%  {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0.5;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -519,35 +65,35 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
       <div class="page-bioline text-fs-16 page-text-color page-title-font mt-12 ln-h-22 text-center">Développeur Full Stack & Formateur numérique</div>
       <div class="flex-both-center flex-wrap mt-24">
         <div class="page-social relative">
-          <a class="social-icon-anchor" aria-label="pinterest" data-id="pinterest" data-type="social_link" target="_blank" href="https://www.youtube.com/@karillon"></a>
+          <a class="social-icon-anchor" aria-label="Youtube" data-id="youtube" data-type="social_link" target="_blank" href="https://www.youtube.com/@karillon"></a>
           <svg class="social-icon-fill" height="30" width="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M39.256,6.5H9.744C4.371,6.5,0,10.885,0,16.274v16.451c0,5.39,4.371,9.774,9.744,9.774h29.512 c5.373,0,9.744-4.385,9.744-9.774V16.274C49,10.885,44.629,6.5,39.256,6.5z M47,32.726c0,4.287-3.474,7.774-7.744,7.774H9.744 C5.474,40.5,2,37.012,2,32.726V16.274C2,11.988,5.474,8.5,9.744,8.5h29.512c4.27,0,7.744,3.488,7.744,7.774V32.726z"></path> <path d="M33.36,24.138l-13.855-8.115c-0.308-0.18-0.691-0.183-1.002-0.005S18,16.527,18,16.886v16.229 c0,0.358,0.192,0.69,0.502,0.868c0.154,0.088,0.326,0.132,0.498,0.132c0.175,0,0.349-0.046,0.505-0.137l13.855-8.113 c0.306-0.179,0.495-0.508,0.495-0.863S33.667,24.317,33.36,24.138z M20,31.37V18.63l10.876,6.371L20,31.37z"></path> </g> </g> </g></svg>
         </div>
         <div class="page-social relative">
-          <a class="social-icon-anchor" aria-label="linkedin" data-id="linkedin" data-type="social_link" target="_blank" href="http://www.linkedin.com/in/marchesson"></a>
+          <a class="social-icon-anchor" aria-label="Linkedin" data-id="linkedin" data-type="social_link" target="_blank" href="http://www.linkedin.com/in/marchesson"></a>
           <svg class="social-icon-fill" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M0.25 3C0.25 1.48122 1.48122 0.25 3 0.25H27C28.5188 0.25 29.75 1.48122 29.75 3V27C29.75 28.5188 28.5188 29.75 27 29.75H3C1.48122 29.75 0.25 28.5188 0.25 27V3ZM3 1.75C2.30964 1.75 1.75 2.30964 1.75 3V27C1.75 27.6904 2.30964 28.25 3 28.25H27C27.6904 28.25 28.25 27.6904 28.25 27V3C28.25 2.30964 27.6904 1.75 27 1.75H3ZM10 9.75H8V8.25H10V9.75ZM8.25 22V12H9.75V22H8.25ZM12.25 12H13.75V13.5359C14.5997 12.7384 15.7428 12.25 17 12.25C19.6234 12.25 21.75 14.3766 21.75 17V22H20.25V17C20.25 15.2051 18.7949 13.75 17 13.75C15.2051 13.75 13.75 15.2051 13.75 17V22H12.25V12Z" fill="white" />
           </svg>
         </div>
         <div class="page-social relative">
-          <a class="social-icon-anchor" aria-label="github" data-id="github" data-type="social_link" target="_blank" href="https://github.com/flashxman"></a>
+          <a class="social-icon-anchor" aria-label="Github" data-id="github" data-type="social_link" target="_blank" href="https://github.com/flashxman"></a>
           <svg class="social-icon-fill" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M19.7998 28.2998C19.3998 28.2998 18.9998 27.9998 18.9998 27.4998V20.1998C18.9998 18.9998 18.9998 18.4998 18.4998 17.9998C18.2998 17.7998 18.1998 17.4998 18.2998 17.1998C18.3998 16.8998 18.5998 16.6998 18.8998 16.6998C22.4998 16.2998 24.6998 15.0998 24.6998 9.99982C24.6998 8.69982 24.1998 7.39982 23.2998 6.49982C23.0998 6.29982 22.9998 5.99982 23.0998 5.69982C23.2998 5.09982 23.3998 4.59982 23.3998 3.99982C23.3998 3.59982 23.2998 3.09982 23.1998 2.69982C22.6998 2.79982 21.5998 2.99982 19.7998 4.19982C19.5998 4.29982 19.3998 4.29982 19.1998 4.29982C16.7998 3.69982 14.1998 3.69982 11.7998 4.29982C11.5998 4.39982 11.3998 4.29982 11.1998 4.19982C9.3998 3.09982 8.2998 2.79982 7.7998 2.79982C7.6998 3.19982 7.5998 3.59982 7.5998 4.09982C7.5998 4.69982 7.6998 5.29982 7.8998 5.79982C7.9998 6.09982 7.8998 6.39982 7.6998 6.59982C7.1998 7.09982 6.8998 7.59982 6.5998 8.19982C6.3998 8.79982 6.1998 9.39982 6.1998 10.0998C6.1998 15.0998 8.3998 16.3998 11.9998 16.7998C12.2998 16.7998 12.4998 16.9998 12.5998 17.2998C12.6998 17.5998 12.5998 17.8998 12.3998 18.0998C11.9998 18.4998 11.7998 19.2998 11.8998 20.4998V22.4998V22.5998V27.5998C11.8998 27.9998 11.5998 28.3998 11.0998 28.3998C10.5998 28.3998 10.2998 28.0998 10.2998 27.5998V23.5998C6.9998 24.1998 5.6998 22.1998 4.8998 20.7998C4.4998 20.0998 4.0998 19.4998 3.6998 19.3998C3.2998 19.2998 3.0998 18.8998 3.1998 18.4998C3.2998 18.0998 3.6998 17.8998 4.0998 17.9998C5.0998 18.2998 5.6998 19.1998 6.1998 20.0998C7.0998 21.4998 7.7998 22.7998 10.3998 22.1998V20.7998C10.2998 19.7998 10.3998 18.9998 10.5998 18.3998C7.4998 17.7998 4.5998 16.1998 4.5998 10.3998C4.5998 9.49982 4.7998 8.69982 5.0998 7.89982C5.4998 6.99982 5.8998 6.39982 6.2998 5.89982C6.1998 5.29982 6.0998 4.69982 6.0998 3.99982C6.0998 3.19982 6.2998 2.39982 6.5998 1.69982C6.6998 1.49982 6.8998 1.29982 7.0998 1.29982C7.3998 1.19982 8.7998 0.999818 11.7998 2.79982C14.2998 2.19982 16.8998 2.19982 19.2998 2.79982C22.2998 0.999818 23.6998 1.19982 23.9998 1.29982C24.1998 1.39982 24.3998 1.49982 24.4998 1.69982C24.7998 2.39982 24.9998 3.19982 24.9998 3.99982C24.9998 4.59982 24.8998 5.29982 24.7998 5.89982C25.7998 7.09982 26.3998 8.49982 26.3998 10.0998C26.3998 15.8998 23.5998 17.5998 20.4998 18.0998C20.6998 18.7998 20.6998 19.4998 20.6998 20.1998V27.4998C20.5998 27.9998 20.1998 28.2998 19.7998 28.2998Z" fill="white" />
           </svg>
         </div>
         <div class="page-social relative">
-          <a class="social-icon-anchor" aria-label="instagram" data-id="instagram" data-type="social_link" target="_blank" href="https://instagram.com/davidmarchesson"></a>
+          <a class="social-icon-anchor" aria-label="Instagram" data-id="instagram" data-type="social_link" target="_blank" href="https://instagram.com/davidmarchesson"></a>
           <svg class="social-icon-fill" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M0.25 9C0.25 4.16751 4.16751 0.25 9 0.25H21C25.8325 0.25 29.75 4.16751 29.75 9V21C29.75 25.8325 25.8325 29.75 21 29.75H9C4.16751 29.75 0.25 25.8325 0.25 21V9ZM9 1.75C4.99594 1.75 1.75 4.99594 1.75 9V21C1.75 25.0041 4.99594 28.25 9 28.25H21C25.0041 28.25 28.25 25.0041 28.25 21V9C28.25 4.99594 25.0041 1.75 21 1.75H9ZM24 7.75H22V6.25H24V7.75ZM8.25 15C8.25 11.2721 11.2721 8.25 15 8.25C18.7279 8.25 21.75 11.2721 21.75 15C21.75 18.7279 18.7279 21.75 15 21.75C11.2721 21.75 8.25 18.7279 8.25 15ZM15 9.75C12.1005 9.75 9.75 12.1005 9.75 15C9.75 17.8995 12.1005 20.25 15 20.25C17.8995 20.25 20.25 17.8995 20.25 15C20.25 12.1005 17.8995 9.75 15 9.75Z" fill="white" />
           </svg>
         </div>
         <div class="page-social relative">
-          <a class="social-icon-anchor" aria-label="facebook" data-id="facebook" data-type="social_link" target="_blank" href="https://www.facebook.com/marchesson"></a>
+          <a class="social-icon-anchor" aria-label="Facebook" data-id="facebook" data-type="social_link" target="_blank" href="https://www.facebook.com/marchesson"></a>
           <svg class="social-icon-fill" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M0.25 15C0.25 6.8538 6.8538 0.25 15 0.25C23.1462 0.25 29.75 6.8538 29.75 15C29.75 23.1462 23.1462 29.75 15 29.75C6.8538 29.75 0.25 23.1462 0.25 15ZM15 1.75C7.68223 1.75 1.75 7.68223 1.75 15C1.75 22.0661 7.28116 27.8403 14.25 28.2291V17.75H10V16.25H14.25V13C14.25 10.3766 16.3766 8.25 19 8.25H20V9.75H19C17.2051 9.75 15.75 11.2051 15.75 13V16.25H20V17.75H15.75V28.2291C22.7188 27.8403 28.25 22.0661 28.25 15C28.25 7.68223 22.3178 1.75 15 1.75Z" fill="white" />
           </svg>
         </div>
         <div class="page-social relative">
-          <a class="social-icon-anchor" aria-label="twitter" data-id="twitter" data-type="social_link" target="_blank" href="https://twitter.com/flashxman"></a>
+          <a class="social-icon-anchor" aria-label="X (twitter)" data-id="twitter" data-type="social_link" target="_blank" href="https://x.com/flashxman"></a>
           <svg class="social-icon-fill" width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <title>Twitter</title>
             <g transform="translate(0.000000,48.000000) scale(0.002100,-0.002368)">
@@ -568,14 +114,14 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
         <div class="page-item-wrap relative">
           <div class="page-item flex-both-center absolute"></div>
           <a target="_blank" class="page-item-each py-10 flex-both-center" href="https://vigifrance.fr" data-type="page_item">
-            <img class="link-each-image loading" data-src="img/icos/vigifrance.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Profil Malt de David Marchesson" />
+            <img class="link-each-image loading" data-src="img/icos/vigifrance.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Vigifrance service d'information sur les risques" />
             <span class="item-title text-center">VigiFrance.fr <strong>L'info sur les risques accessible à tous !</strong></span>
           </a>
         </div>
         <div class="page-item-wrap relative">
           <div class="page-item flex-both-center absolute"></div>
           <a target="_blank" class="page-item-each py-10 flex-both-center" href="https://karillon.fr" data-type="page_item">
-            <img class="link-each-image loading" data-src="img/icos/karillon.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Profil Malt de David Marchesson" />
+            <img class="link-each-image loading" data-src="img/icos/karillon.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Outils pour une meilleure communication parent-enfant" />
             <span class=" item-title text-center">Karillon.fr <strong>Outils pour améliorer la communication parent-enfant</strong></span>
           </a>
         </div>
@@ -587,7 +133,7 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
         <div class="page-item-wrap relative">
           <div class="page-item flex-both-center absolute"></div>
           <a target="_blank" class="page-item-each py-10 flex-both-center" href="https://freelance.marchesson.com" data-type="page_item">
-            <img style="background-color: #c50000" class="link-each-image" data-src="img/icos/freelance.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Profil Malt de David Marchesson" />
+            <img style="background-color: #c50000" class="link-each-image" data-src="img/icos/freelance.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Développer Freelance - David Marchesson" />
             <span class=" item-title text-center">Freelance <strong>Formateur et Développeur créatif senior</strong> <!-- : des compétences à votre service--></span>
           </a>
         </div>
@@ -601,7 +147,7 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
         <div class="page-item-wrap relative">
           <div class="page-item flex-both-center absolute"></div>
           <a target="_blank" class="page-item-each py-10 flex-both-center" href="https://eclaireur.net" data-type="page_item">
-            <img style="background-color: #93b148;transform:rotate(270deg)" class="link-each-image" data-src="img/icos/freelance.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Profil Malt de David Marchesson" />
+            <img style="background-color: #93b148;transform:rotate(270deg)" class="link-each-image" data-src="img/icos/freelance.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Blog personnel de David Marchesson" />
             <span class=" item-title text-center">Eclaireur.net <strong>Blog personnel qui n'engage que moi</strong></span>
           </a>
         </div>
@@ -635,14 +181,14 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
         </div>
         <div class="page-item-wrap relative">
           <div class="page-item flex-both-center absolute"></div>
-          <a target="_blank" class="page-item-each py-10 flex-both-center" href="http://www.linkedin.com/in/marchesson" data-id="261652" data-type="page_item">
+          <a target="_blank" class="page-item-each py-10 flex-both-center" href="http://www.linkedin.com/in/marchesson" data-id="261652" data-type="page_item" aria-label="Linkedin">
             <img class="link-each-image loading" data-src="img/icos/linkedin.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="LinkedIn de David Marchesson" />
             <span class=" item-title text-center">LinkedIn <strong>Profil de David Marchesson</strong></span>
           </a>
         </div>
         <div class="page-item-wrap relative">
           <div class="page-item flex-both-center absolute"></div>
-          <a target="_blank" class="page-item-each py-10 flex-both-center" href="https://www.marchesson.com/#contact" data-type="page_item">
+          <a target="_blank" class="page-item-each py-10 flex-both-center" href="javascript:location.href = 'mailto:' + ['contact','marchesson.com'].join('@')" data-type="page_item" aria-label="Email">
             <img class="link-each-image loading" data-src="img/icos/email.svg" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Contact David Marchesson" />
             <span class=" item-title text-center">Me contacter <strong>Une idée de projet, un besoin en formation ?</strong></span>
           </a>
@@ -673,6 +219,3 @@ if ($_SERVER['SERVER_NAME'] !== 'localhost') {
   </div>
 </body>
 </html>
-<?php
-ob_end_clean();
-?>
