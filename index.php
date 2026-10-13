@@ -54,8 +54,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
 
 <body>
   <div class="min-h-full flex-h-center" id="background_div">
-    <img class="page-image" data-src="img/bg/bg.webp" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="background" />
-    <canvas id="bg-canvas" class="background-overlay"></canvas>
+    <canvas id="bg-canvas" class="background-overlay" aria-hidden="true"></canvas>
     <div class="mt-48 page-full-wrap relative ">
       <img class="display-image m-auto loading" data-src="img/profile.webp" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="David Marchesson" />
       <h2 class="page-text-color page-title-font mt-16 text-center">
@@ -121,7 +120,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
           <div class="page-item flex-both-center absolute"></div>
           <a target="_blank" class="page-item-each py-10 flex-both-center" href="https://karillon.fr" data-type="page_item">
             <img class="link-each-image loading" data-src="img/icos/karillon.png" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Outils pour une meilleure communication parent-enfant" />
-            <span class=" item-title text-center">Karillon.fr <strong>Outils pour améliorer la communication parent-enfant</strong></span>
+            <span class=" item-title text-center">Karillon.fr <strong>Outils pour mieux communiquer avec ses enfants</strong></span>
           </a>
         </div>
       </div>
@@ -198,6 +197,39 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
       </div>
       </div>
     <script>
+      (function() {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const c = document.getElementById('bg-canvas'), x = c.getContext('2d');
+        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789';
+        const fs = 16, bg = '223,236,248';
+        let w = 0, h, drops, last = 0;
+        function size() {
+          if (innerWidth === w) return; // ignore mobile address-bar height changes
+          const d = devicePixelRatio || 1;
+          w = innerWidth; h = Math.max(innerHeight, screen.height);
+          c.width = w * d; c.height = h * d;
+          c.style.height = h + 'px';
+          x.setTransform(d, 0, 0, d, 0, 0);
+          x.font = fs + 'px monospace';
+          drops = Array.from({ length: Math.ceil(w / fs) }, () => -Math.random() * h / fs | 0);
+        }
+        function frame(t) {
+          if (t - last > 50) {
+            last = t;
+            x.fillStyle = 'rgba(' + bg + ',.1)';
+            x.fillRect(0, 0, w, h);
+            x.fillStyle = 'rgba(31,54,92,.35)';
+            drops.forEach((y, i) => {
+              x.fillText(chars[Math.random() * chars.length | 0], i * fs, y * fs);
+              drops[i] = y * fs > innerHeight / 2 && Math.random() > .975 ? 0 : y + 1; // invisible past mid-screen (CSS mask)
+            });
+          }
+          requestAnimationFrame(frame);
+        }
+        size();
+        addEventListener('resize', size);
+        requestAnimationFrame(frame);
+      })();
       document.addEventListener('DOMContentLoaded', function() {
         const lazyImages = document.querySelectorAll('img[loading="lazy"]');
         const observer = new IntersectionObserver((lazyImages, observer) => {

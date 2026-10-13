@@ -3,7 +3,8 @@ html {
   -ms-scroll-chaining: none;
   overscroll-behavior: none;
   margin: 0;
-  padding: 0
+  padding: 0;
+  background: #dfecf8
 }
 .min-h-full {
   min-height: 100vh
@@ -156,9 +157,13 @@ html {
 
 .background-overlay {
   position: fixed;
+  inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000, transparent 50vh);
+  mask-image: linear-gradient(#000, transparent 50vh)
 }
 
 .page-image {
